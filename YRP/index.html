@@ -1,0 +1,358 @@
+
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Yamuna River Project</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+	<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class='modal'>
+		<h2 class='modal-title'>About this project</h2>
+		<div class='modal-body'><p>As a part of the Yamuna River Project, the aim of this website is to visually depict the urban data for the Delhi region and provide means for selective urban mapping and analysis.</p>
+
+
+<p>Map data courtesy of <a href='https://www.mapbox.com/studio/'>Mapbox Studio</a> </a></p><p>For questions or to improve this map, contact <a href='mailto:ssv4yt@virginia.edu'>Siddharth Velamakanni</a></p></div>
+		<button class='close-button'>&times;</button>  	<!-- A special "x" character (the multiply sign) used in close buttons -->	
+	</div>
+	<div id='screen'></div>
+
+	<!-- Button to hide or show "About this map" modal -->	
+	
+<style>
+    #menu {
+        background: #fff;
+        position: absolute;
+        z-index: 1;
+        top: 150px;
+        right: 10px;
+        border-radius: 3px;
+        width: 120px;
+        border: 1px solid rgba(0,0,0,0.4);
+        font-family: 'Open Sans', sans-serif;
+    }
+
+    #menu a {
+        font-size: 13px;
+        color: #404040;
+        display: block;
+        margin: 0;
+        padding: 0;
+        padding: 10px;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(0,0,0,0.25);
+        text-align: center;
+    }
+
+    #menu a:last-child {
+        border: none;
+    }
+
+    #menu a:hover {
+        background-color: #f8f8f8;
+        color: #404040;
+    }
+
+    #menu a.active {
+        background-color: #3887be;
+        color: #ffffff;
+    }
+
+    #menu a.active:hover {
+        background: #3074a4;
+    }
+	.legend {
+    background-color: #fff;
+    border-radius: 3px;
+    bottom: 30px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.10);
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    padding: 10px;
+    position: absolute;
+    right: 10px;
+    z-index: 1;
+}
+
+.legend h4 {
+    margin: 0 0 10px;
+}
+
+.legend div span {
+    border-radius: 50%;
+    display: inline-block;
+    height: 10px;
+    margin-right: 5px;
+    width: 10px;
+}
+
+</style>
+
+<nav id="menu"></nav>
+<div id="map"></div>
+
+<div id='PopulationL' class='legend' style="visibility: hidden;">
+    <h4>Population</h4>
+    <div><span style='background-color: #7F0400'></span>64235 - 145715</div>
+    <div><span style='background-color: #F5776C'></span>55104 - 64235</div>
+    <div><span style='background-color: #D2FF67'></span>48437 - 55104</div>
+    <div><span style='background-color: #00B264'></span>14662 - 48437</div>
+</div>
+<div id='LiteracyL' class='legend' style="visibility: hidden;">
+    <h4>Literacy</h4>
+    <div><span style='background-color: #f7faff'></span>0 - 37276</div>
+    <div><span style='background-color: #c6dbf0'></span>37276 - 42115</div>
+    <div><span style='background-color: #6bafb6'></span>42116 - 49632</div>
+    <div><span style='background-color: #084596'></span>49632 - 117293</div>
+</div>
+<div id='HousingL' class='legend' style="visibility: hidden;">
+    <h4>Housing</h4>
+    <div><span style='background-color: #faf3ad'></span>0 - 44</div>
+    <div><span style='background-color: #eeae33'></span>45 - 64</div>
+    <div><span style='background-color: #dd7225'></span>65	- 77</div>
+    <div><span style='background-color: #b4461f'></span>78 - 94</div>
+</div>
+
+
+<button type='button' class='button-default' id="about">Yamuna River Project</button>
+<div class='map-overlay' id='feature'><h2>Ward population</h2><div id='pd'><p>Hover over a Ward!</p></div></div>
+
+<script>
+mapboxgl.accessToken = 'pk.eyJ1Ijoic3JpY2hhbmRyYSIsImEiOiJjajd0YWNvZHExbHJnMndxcnFzN3E2OGphIn0.U0f61po2cIjPIhH7Hz8V6g';
+var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/srichandra/cj8mjlw816w652rpfyhk4qunh',
+    zoom: 9.5,
+    center: [77.226654, 28.645488]
+});
+
+map.on('load', function () {
+    map.addSource('Transport_Points-20171116T091-bxao5n', {
+        type: 'vector',
+        url: 'mapbox://srichandra.cwdfsqa7'
+    });
+    map.addLayer({
+        'id': 'Transport Points',
+        'type': 'circle',
+        'source': 'Transport_Points-20171116T091-bxao5n',
+        'layout': {
+            'visibility': 'none'
+        },
+        'paint': {
+            'circle-radius': 8,
+            'circle-color': 'rgba(19,94,155,1)'
+        },
+        'source-layer': 'Transport_Points-20171116T091-bxao5n'
+    });
+
+    map.addSource('del-1j8c2r', {
+        type: 'vector',
+        url: 'mapbox://srichandra.b5xkn9c3'
+    });
+    map.addLayer({
+        'id': 'Boundary',
+        'type': 'fill',
+        'source': 'del-1j8c2r',
+        'source-layer': 'del-1j8c2r',
+        'layout': {
+            'visibility': 'visible'
+            
+        },
+        'paint': {
+            'fill-color': 'rgba(255,255,255,0.5)',
+			'fill-opacity': 0.1
+			
+            
+        }
+    });
+	    map.addSource('Ameneties-20171116T083735Z-00-0gjtmq', {
+        type: 'vector',
+        url: 'mapbox://srichandra.bzbtfz0p'
+    });
+    map.addLayer({
+        'id': 'Ameneties',
+        'type': 'circle',
+        'source': 'Ameneties-20171116T083735Z-00-0gjtmq',
+        'source-layer': 'Ameneties-20171116T083735Z-00-0gjtmq',
+        'layout': {
+            'visibility': 'none'
+            
+        },
+        'paint': {
+            'circle-radius': 8,
+            'circle-color': 'rgba(234,164,33,1)'
+        }
+    });
+	
+	
+	
+	map.addLayer({
+        'id': 'Buildings',
+        'type': 'fill-extrusion',
+        'source': 'Buildings-20171116T085306Z-00-cb0hud',
+        'source-layer': 'Buildings-20171116T085306Z-00-cb0hud',
+        'layout': {
+            'visibility': 'visible'
+            
+        },
+        'paint': {
+            'fill-extrusion-color': '#bbb',
+
+            // use an 'interpolate' expression to add a smooth transition effect to the
+            // buildings as the user zooms in
+            'fill-extrusion-height': [
+                "interpolate", ["linear"], ["zoom"],
+                15, 0,
+                150.05, ["get", "height"]
+            ],
+            'fill-extrusion-base': [
+                "interpolate", ["linear"], ["zoom"],
+                15, 0,
+                15.05, ["get", "min_height"]
+            ],
+            'fill-extrusion-opacity': .9 }
+    });
+	map.addSource('Ward_Data', {
+        type: 'vector',
+        url: 'mapbox://srichandra.cjamdfw9y31ig33quipoh9hrn-38tm0'
+    });
+    map.addLayer({
+        'id': 'Population',
+        'type': 'fill',
+        'source': 'Ward_Data',
+        'layout': {
+            'visibility': 'none'
+        },
+        'paint': {'fill-color': {
+                property: 'TOT_POP',
+                stops: [
+                                      
+                    [48437, '#00B264'],
+                    [55104, '#D2FF67'],
+                    [64235, '#F5776C'],
+                    [145715, '#7F0400']
+                    
+                ]
+            },
+			'fill-opacity': 0.5
+            
+        },
+        'source-layer': 'Ward_Data'
+    });
+	map.addLayer({
+        'id': 'Literacy',
+        'type': 'fill',
+        'source': 'Ward_Data',
+        'layout': {
+            'visibility': 'none'
+        },
+        'paint': {'fill-color': {
+                property: 'TOT_LIT',
+                stops: [
+                                      
+                    [37275.5, '#f7faff'],
+                    [42115, '#c6dbf0'],
+                    [49632.5, '#6bafb6'],
+                    [117293, '#084596']
+                    
+                ]
+            },
+			'fill-opacity': 0.5
+            
+        },
+        'source-layer': 'Ward_Data'
+    });
+	map.addLayer({
+        'id': 'Housing',
+        'type': 'fill',
+        'source': 'Ward_Data',
+        'layout': {
+            'visibility': 'none'
+        },
+        'paint': {'fill-color': {
+                property: 'HC_TOT_GOD',
+                stops: [
+                                      
+                    [44, '#faf3ad'],
+                    [64, '#eeae33'],
+                    [77, '#dd7225'],
+                    [94, '#b4461f']
+                    
+                ]
+            },
+			'fill-opacity': 0.5
+            
+        },
+        'source-layer': 'Ward_Data'
+    });
+	
+
+});
+
+
+var toggleableLayerIds = ['Transport Points','Ameneties','Population','Literacy','Housing' ];
+
+for (var i = 0; i < toggleableLayerIds.length; i++) {
+    var id = toggleableLayerIds[i];
+
+    var link = document.createElement('a');
+    link.href = '#';
+    link.className = 'active';
+    link.textContent = id;
+
+    link.onclick = function (e) {
+        var clickedLayer = this.textContent;
+        e.preventDefault();
+        e.stopPropagation();
+
+        var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+
+        if (visibility === 'visible') {
+            map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+            this.className = '';
+        } else {
+            this.className = 'active';
+            map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+        }
+		var clickedLayerL=clickedLayer.concat("L");
+		
+        if(document.getElementById(clickedLayerL).style.visibility=='hidden') {
+          document.getElementById(clickedLayerL).style.visibility='visible';
+		  
+        }else {
+            
+            document.getElementById(clickedLayerL).style.visibility='hidden';
+        }
+    };
+
+    var layers = document.getElementById('menu');
+    layers.appendChild(link);
+
+}
+$('#about').on('click', function() {
+
+ $('#screen').fadeToggle();  // toggles visibility of background screen when clicked (shows if hidden, hides if visible)
+
+ $('.modal').fadeToggle();  // toggles visibility of background screen when clicked (shows if hidden, hides if visible)                         
+ 
+});
+
+// Close "About this Map" modal when close button in modal is clicked
+$('.modal .close-button').on('click', function() {
+
+ $('#screen').fadeToggle();  // toggles visibility of background screen when clicked (shows if hidden, hides if visible)
+
+ $('.modal').fadeToggle();  // toggles visibility of background screen when clicked (shows if hidden, hides if visible)                         
+ 
+});
+
+</script>
+
+</body>
+</html>

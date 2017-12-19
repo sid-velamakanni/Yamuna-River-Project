@@ -1,0 +1,118 @@
+
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+h2,
+h3 {
+  font-size: 1.2em;
+}
+
+h3 {
+  font-size: 1em;
+}
+
+p {
+  font-size: 0.85em;
+  text-align: left;
+}
+
+/* Create a position for the map on the page */
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+/* Set rules for how the map overlays (info box and legend) will be displayed on the page. */
+.map-overlay {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.8);
+  margin-right: 20px;
+  font-family: Courier, sans-serif;
+  overflow: auto;
+  border-radius: 3px;
+}
+
+#feature {
+  top: 0;
+  height: 100px;
+  margin-top: 20px;
+  width: 250px;
+}
+
+
+
+/* Modals */
+#screen {
+	display: none;
+	width: 100vw;
+	height: 100vh;
+	position: absolute;
+	background-color: black;
+	opacity: 0.6;
+	z-index: 1;
+}
+
+.modal {
+	display: none;
+    width: 600px;
+    height: 300px;
+    position: absolute;
+    margin: 0 auto;
+    margin-top: 150px;
+    left: 0;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 100;
+    padding: 30px;
+    font-family: Courier;
+}
+
+.modal .close-button {
+	color: black;
+	position: absolute;
+	right: 0;
+	top: 0;
+	margin: 10px;
+	line-height: 30px;
+	font-size: 30px;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.modal .close-button:hover { 
+	color: #bbb;
+}
+
+
+
+
+
+/* About this Map Button */
+.button-default {
+    position: fixed;
+    top: 20px;
+	left:550px;
+    background: #4CAF50;
+    border: none;
+	width=100%;
+    background-color: #fff;
+    border-radius: 3px;
+    font: 20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    padding: 10px;
+    }
+
+.button-default:hover {
+    background: #3e8e41;
+}
+
+.button-default:active {
+    background: #3e8e41;
+}
